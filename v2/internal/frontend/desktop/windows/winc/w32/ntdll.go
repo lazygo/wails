@@ -3,7 +3,7 @@
 package w32
 
 import (
-	"errors"
+	"fmt"
 	"syscall"
 	"unsafe"
 )
@@ -37,16 +37,13 @@ func RtlGetVersion() (*osVersionInfoEx, error) {
 	var info osVersionInfoEx
 	info.osVersionInfoSize = uint32(unsafe.Sizeof(info))
 	// 调用RtlGetVersion，传入结构体指针
-	ret, _, err := procRtlGetVersion.Call(uintptr(unsafe.Pointer(&info)))
-	if err != nil {
-		return nil, err
-	}
+	ret, _, _ := procRtlGetVersion.Call(uintptr(unsafe.Pointer(&info)))
 	if ret == 0 {
 		// STATUS_SUCCESS
 		return &info, nil
 	}
 
-	return nil, errors.New("proc RtlGetVersion error")
+	return nil, fmt.Errorf("proc RtlGetVersion error %d", ret)
 }
 
 func IsWindows7() bool {
